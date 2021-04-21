@@ -1,9 +1,6 @@
 package com.example.blogdevelop.Domain;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -14,9 +11,10 @@ import java.util.List;
 @Setter
 @Table(name = "category")
 @NoArgsConstructor
+@EqualsAndHashCode(of = "id")
 public class Category {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String name;
 

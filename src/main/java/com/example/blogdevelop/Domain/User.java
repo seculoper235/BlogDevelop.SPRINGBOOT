@@ -13,7 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @EqualsAndHashCode(of = "id")
 public class User {
-    @Id @GeneratedValue
+    @Id
     private String id;
     private String username;
     private String password;
