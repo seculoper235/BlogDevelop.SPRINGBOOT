@@ -45,7 +45,6 @@ public class UserTest {
         User user = User.builder()
                 .id("seculoper")
                 .description("취미가 개발인 수학자")
-                .image("asset/img/test.png")
                 .username("seculoper")
                 .password("test")
                 .postList(postList)
@@ -104,7 +103,9 @@ public class UserTest {
 
         // When
         User resultUser = userRepository.findById(user.getId()).get();
-        resultUser.setUsername("mathematician");
+        resultUser.builder()
+                .username("mathematician")
+                .build();
         User testUser = entityManager.persist(resultUser);
 
         //Then

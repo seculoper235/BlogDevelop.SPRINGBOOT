@@ -6,7 +6,6 @@ import javax.persistence.*;
 
 @Entity
 @Getter
-@Setter
 @Table(name = "post")
 @NoArgsConstructor
 @EqualsAndHashCode(of = "id")
