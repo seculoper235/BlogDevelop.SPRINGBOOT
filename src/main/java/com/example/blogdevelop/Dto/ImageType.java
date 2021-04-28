@@ -4,4 +4,6 @@ public enum ImageType {
     NONE,
     BACKGROUND,
     PROFILE,
+    THUMB,
+    MAIN
 }

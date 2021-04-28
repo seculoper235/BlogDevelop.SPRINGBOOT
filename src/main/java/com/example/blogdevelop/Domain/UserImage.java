@@ -1,5 +1,6 @@
 package com.example.blogdevelop.Domain;
 
+import com.example.blogdevelop.Dto.ImageType;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -24,10 +25,14 @@ public class UserImage {
     @JoinColumn(name = "file_id")
     private File file;
 
+    @Enumerated(EnumType.STRING)
+    private ImageType imageType;
+
     @Builder
-    public UserImage(int id, User user, File file) {
+    public UserImage(int id, User user, File file, ImageType imageType) {
         this.id = id;
         this.user = user;
         this.file = file;
+        this.imageType = imageType;
     }
 }
