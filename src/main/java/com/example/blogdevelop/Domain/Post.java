@@ -3,6 +3,7 @@ package com.example.blogdevelop.Domain;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Getter
@@ -24,12 +25,16 @@ public class Post {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @OneToMany(mappedBy = "post")
+    private List<PostImage> postImageList;
+
     @Builder
-    public Post(int id, String title, String content, Category category, User user) {
+    public Post(int id, String title, String content, Category category, User user, List<PostImage> postImageList) {
         this.id = id;
         this.title = title;
         this.content = content;
         this.category = category;
         this.user = user;
+        this.postImageList = postImageList;
     }
 }
