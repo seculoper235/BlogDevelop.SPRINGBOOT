@@ -92,7 +92,9 @@ public class CategoryTest {
 
         // When
         Category updateCategory = categoryRepository.findById(category.getId()).get();
-        updateCategory.setName("카테고리2");
+        updateCategory.builder()
+                .name("카테고리2")
+                .build();
         Category testCategory = categoryRepository.save(updateCategory);
 
         //Then

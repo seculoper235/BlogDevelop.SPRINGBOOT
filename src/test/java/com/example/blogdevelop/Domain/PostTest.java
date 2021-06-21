@@ -105,7 +105,9 @@ public class PostTest {
 
         // When
         Post expectPost = postRepository.findById(post.getId()).get();
-        expectPost.setTitle("post2");
+        expectPost.builder()
+                .title("post2")
+                .build();
         Post resultPost = entityManager.persist(expectPost);
 
         // Then
