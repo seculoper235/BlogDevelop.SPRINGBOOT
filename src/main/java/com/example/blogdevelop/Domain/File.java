@@ -1,15 +1,13 @@
 package com.example.blogdevelop.Domain;
 
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
+@Setter
 @NoArgsConstructor
 @EqualsAndHashCode(of = "id")
 @Table(name = "file")
@@ -27,15 +25,12 @@ public class File {
 
     private int deleteFlag;
 
-    private LocalDateTime createAt;
-
     @Builder
-    public File(int id, String name, String saveName, String contentType, int deleteFlag, LocalDateTime createAt) {
+    public File(int id, String name, String saveName, String contentType, int deleteFlag) {
         this.id = id;
         this.name = name;
         this.saveName = saveName;
         this.contentType = contentType;
         this.deleteFlag = deleteFlag;
-        this.createAt = createAt;
     }
 }

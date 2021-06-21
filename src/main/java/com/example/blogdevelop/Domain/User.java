@@ -8,6 +8,7 @@ import java.util.List;
 
 @Entity
 @Getter
+@Setter
 @Table(name = "user")
 @NoArgsConstructor
 @EqualsAndHashCode(of = "id")
@@ -22,16 +23,16 @@ public class User {
     @OneToMany(mappedBy = "user")
     private List<Post> postList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user_image")
-    private List<UserImage> userImageList = new ArrayList<>();
+    @OneToOne(mappedBy = "user")
+    private UserImage userImage;
 
     @Builder
-    public User(String id, String username, String password, String description, List<Post> postList,  List<UserImage> userImageList) {
+    public User(String id, String username, String password, String description, List<Post> postList,  UserImage userImage) {
         this.id = id;
         this.username = username;
         this.password = password;
         this.description = description;
         this.postList = postList;
-        this.userImageList = userImageList;
+        this.userImage = userImage;
     }
 }

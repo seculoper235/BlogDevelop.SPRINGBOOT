@@ -7,6 +7,7 @@ import java.util.List;
 
 @Entity
 @Getter
+@Setter
 @Table(name = "post")
 @NoArgsConstructor
 @EqualsAndHashCode(of = "id")
@@ -21,7 +22,8 @@ public class Post {
     @JoinColumn(name = "category_id")
     private Category category;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    //
+   @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
