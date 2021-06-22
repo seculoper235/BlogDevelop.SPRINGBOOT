@@ -1,6 +1,6 @@
 package com.example.blogdevelop.Domain;
 
-import com.example.blogdevelop.Dto.ImageType;
+import com.example.blogdevelop.Web.Dto.ImageType;
 import lombok.*;
 
 import javax.persistence.*;

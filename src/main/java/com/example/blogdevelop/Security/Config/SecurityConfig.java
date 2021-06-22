@@ -37,6 +37,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 ;
 
         http.oauth2Login()
+                // 사용자 정보를 등록하는 Url
+                .defaultSuccessUrl("/recruit")
                 .userInfoEndpoint()
                 .userService(oAuthService)
             .and()
