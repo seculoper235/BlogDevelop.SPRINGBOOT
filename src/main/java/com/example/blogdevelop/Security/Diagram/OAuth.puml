@@ -1,0 +1,50 @@
+@startuml
+
+actor Owner
+
+actor App_Front
+actor App_Auth
+actor App_Red
+actor App_Token
+actor App_Info
+
+actor Social_Auth
+actor Social_Token
+actor Social_Info
+
+autonumber
+
+group Google OAuth 흐름도
+   Owner -> App_Front : 애플리케이션에 접근
+   return  Social 로그인 버튼을 띄움
+
+   group Social에 OAuth 로그인 요청
+      Owner -> App_Auth : App의 Authorization Endpoint로 이동
+      App_Auth -> Social_Auth : Owner 정보를 가지고 Social Auth(/v2/auth) 서버에 접속
+   end
+
+   group 유저 선택(/v2/auth/oauthchooseaccount)
+      Social_Auth --> Owner : 사용할 Owner 선택을 위해, oauthchooseaccount라는 Social 선택 창을 띄움
+      Owner -> Social_Auth : 선택한 Owner 정보를 가지고 Social Auth(/v2/auth) 서버에 접속
+   end
+
+   group 권한 승인(authorization_code)
+      Social_Auth --> Owner : 해당 Owner에게 OAuth 동의 화면을 띄움(이는 Social OAuth에서 등록 가능)
+      Owner -> Social_Auth : 권한 승인에 동의하면, /v2/auth로 정보를 전송
+      Social_Auth -> Social_Auth : authorization_code를 생성
+      Social_Auth --> App_Red : (수정)지정한 redirect-uri로 생성한 auth_code를 전송
+   end
+
+   group 최종 access token 발급(직접 가능)
+      App_Token -> Social_Token : 해당 URI에서 id와 secret, auth_code를 묶어서 /v4/token으로 POST 전송
+      Social_Token --> App_Token :  최종 사용 가능한 access token을 발급
+   end
+
+   Owner -> App_Front : 해당되는 OAuth API 사용(혹은 로그인 재요청)
+   group Owner 정보 사용하기(직접 가능)
+      App_Info -> Social_Info : UserInfo Endpoint에서 loadUser()로 access token을 담아 사용을 요청(GET /auth/userinfo.profile, Authorization: Bearer {access token})
+      Social_Info --> App_Info : access token을 보고 식별한 후, 응답을 보냄
+   end
+   App_Front --> Owner : 응답 결과를 반환
+end
+@enduml
