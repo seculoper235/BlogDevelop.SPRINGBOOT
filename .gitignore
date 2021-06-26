@@ -1,5 +1,7 @@
 HELP.md
 target/
+src/main/java/com/example/blogdevelop/Diagram/
+src/main/resources/application-oauth.properties
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
@@ -18,6 +20,7 @@ target/
 *.iws
 *.iml
 *.ipr
+*.uml
 
 ### NetBeans ###
 /nbproject/private/
