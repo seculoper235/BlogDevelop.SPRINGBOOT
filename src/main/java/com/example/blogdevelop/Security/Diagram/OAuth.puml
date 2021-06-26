@@ -32,12 +32,12 @@ group Google OAuth 흐름도
       Social_Auth --> Owner : 해당 Owner에게 OAuth 동의 화면을 띄움(이는 Social OAuth에서 등록 가능)
       Owner -> Social_Auth : 권한 승인에 동의하면, /v2/auth로 정보를 전송
       Social_Auth -> Social_Auth : authorization_code를 생성
-      Social_Auth --> App_Red : (수정)지정한 redirect-uri로 생성한 auth_code를 전송
+      Social_Auth --> App_Red : (수정)지정한 redirect-uri 중 하나로 생성한 auth_code를 전송
    end
 
    group 최종 access token 발급(직접 가능)
       App_Token -> Social_Token : 해당 URI에서 id와 secret, auth_code를 묶어서 /v4/token으로 POST 전송
-      Social_Token --> App_Token :  최종 사용 가능한 access token을 발급
+      Social_Token --> App_Red :  (수정)지정한 redirect-uri 중 하나로 최종 사용 가능한 access token을 발급
    end
 
    Owner -> App_Front : 해당되는 OAuth API 사용(혹은 로그인 재요청)
