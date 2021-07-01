@@ -2,12 +2,15 @@ package com.example.blogdevelop.Security.Config;
 
 import com.example.blogdevelop.Security.Service.OAuthService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.session.data.redis.RedisIndexedSessionRepository;
+import org.springframework.session.security.SpringSessionBackedSessionRegistry;
 
 import javax.sql.DataSource;
 
@@ -15,6 +18,7 @@ import javax.sql.DataSource;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private DataSource dataSource;
     private OAuthService oAuthService;
+    private RedisIndexedSessionRepository sessionRepository;
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -32,23 +36,24 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.sessionManagement()
                 .maximumSessions(1)
                 .maxSessionsPreventsLogin(true)
+                .sessionRegistry(sessionRegistry())
             .and()
                 .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                 ;
 
         http.oauth2Login()
-                // 사용자 정보를 등록하는 Url
-                .defaultSuccessUrl("/recruit")
                 .userInfoEndpoint()
                 .userService(oAuthService)
-            .and()
-                .authorizationEndpoint()
-                    .baseUri("/login")
                 ;
     }
 
     @Override
     public void configure(WebSecurity web) throws Exception {
         super.configure(web);
+    }
+
+    @Bean
+    private SpringSessionBackedSessionRegistry<?> sessionRegistry() {
+        return new SpringSessionBackedSessionRegistry<>(sessionRepository);
     }
 }
