@@ -1,7 +1,5 @@
 HELP.md
 target/
-src/main/java/com/example/blogdevelop/Diagram/category.uml
-src/main/resources/application-oauth.properties
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
@@ -31,6 +29,9 @@ src/main/resources/application-oauth.properties
 build/
 !**/src/main/**/build/
 !**/src/test/**/build/
+src/main/java/com/example/blogdevelop/Diagram/**
+src/main/resources/application-oauth.properties
+src/main/resources/application-redis.properties
 
 ### VS Code ###
 .vscode/
