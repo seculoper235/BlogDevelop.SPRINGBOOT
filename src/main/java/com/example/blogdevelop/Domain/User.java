@@ -28,10 +28,11 @@ public class User {
     private UserImage userImage;
 
     @Builder
-    public User(String id, String username, String password, String description, List<Post> postList,  UserImage userImage) {
+    public User(String id, String username, String password, String email, String description, List<Post> postList,  UserImage userImage) {
         this.id = id;
         this.username = username;
         this.password = password;
+        this.email= email;
         this.description = description;
         this.postList = postList;
         this.userImage = userImage;
