@@ -3,36 +3,28 @@ package com.example.blogdevelop.Security.Config;
 import com.example.blogdevelop.Security.Service.OAuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.session.Session;
 import org.springframework.session.data.redis.RedisIndexedSessionRepository;
 import org.springframework.session.security.SpringSessionBackedSessionRegistry;
 
-import javax.sql.DataSource;
 
+@Configuration
+@EnableWebSecurity
 @RequiredArgsConstructor
-public class SecurityConfig extends WebSecurityConfigurerAdapter {
-    private DataSource dataSource;
-    private OAuthService oAuthService;
-    private RedisIndexedSessionRepository sessionRepository;
-
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.jdbcAuthentication()
-                .dataSource(dataSource)
-                .authoritiesByUsernameQuery("SELECT")
-                .usersByUsernameQuery("SELECT")
-                .passwordEncoder(new BCryptPasswordEncoder())
-                .rolePrefix("ROLE_")
-                ;
-    }
+public class SecurityConfig<s extends Session> extends WebSecurityConfigurerAdapter {
+    private final OAuthService oAuthService;
+    private final RedisIndexedSessionRepository sessionRepository;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+        http.csrf().disable();
+
         http.sessionManagement()
                 .maximumSessions(1)
                 .maxSessionsPreventsLogin(true)
@@ -42,8 +34,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 ;
 
         http.oauth2Login()
+                .defaultSuccessUrl("/auth")
                 .userInfoEndpoint()
                 .userService(oAuthService)
+                ;
+
+        http.authorizeRequests()
+                .antMatchers("/").permitAll()
+                .anyRequest().authenticated()
                 ;
     }
 
@@ -53,7 +51,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    private SpringSessionBackedSessionRegistry<?> sessionRegistry() {
+    SpringSessionBackedSessionRegistry<?> sessionRegistry() {
         return new SpringSessionBackedSessionRegistry<>(sessionRepository);
     }
 }
