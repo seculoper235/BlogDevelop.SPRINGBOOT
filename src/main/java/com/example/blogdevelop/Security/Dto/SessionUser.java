@@ -5,18 +5,14 @@ import lombok.Getter;
 
 import java.io.Serializable;
 
-public class SessionUser implements Serializable {
-    private String name;
-    private String email;
-    private String image;
-
-    /** 구글 전용 객체 **/
+public class SessionUser {
     @Getter
-    public static class Google {
+    public static class Google implements Serializable {
         private final String name;
         private final String email;
         private final String image;
 
+        /** 구글 전용 객체 **/
         @Builder
         public Google(UserDto userDto) {
             this.name = userDto.getUsername();
