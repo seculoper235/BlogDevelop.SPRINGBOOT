@@ -7,10 +7,11 @@ import com.example.blogdevelop.Security.Dto.UserDto;
 public class UserMapper {
     public static User toEntity(UserDto userDto) {
         return User.builder()
+                .id("핑핑")
+                .password("1234")
                 .username(userDto.getUsername())
                 .email(userDto.getEmail())
-                .userImage(UserImage.builder()
-                        .build())
+                .description(userDto.getImage())
                 .build()
                 ;
     }
