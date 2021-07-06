@@ -34,7 +34,6 @@ public class SecurityConfig<s extends Session> extends WebSecurityConfigurerAdap
                 ;
 
         http.oauth2Login()
-                .defaultSuccessUrl("/auth")
                 .userInfoEndpoint()
                 .userService(oAuthService)
                 ;
