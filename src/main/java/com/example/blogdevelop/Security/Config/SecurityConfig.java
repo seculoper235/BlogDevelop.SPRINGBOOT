@@ -1,6 +1,6 @@
 package com.example.blogdevelop.Security.Config;
 
-import com.example.blogdevelop.Security.Service.OAuthService;
+import com.example.blogdevelop.Security.Dto.Mapper.TokenResponseClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,7 +18,6 @@ import org.springframework.session.security.SpringSessionBackedSessionRegistry;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig<s extends Session> extends WebSecurityConfigurerAdapter {
-    private final OAuthService oAuthService;
     private final RedisIndexedSessionRepository sessionRepository;
 
     @Override
@@ -34,8 +33,8 @@ public class SecurityConfig<s extends Session> extends WebSecurityConfigurerAdap
                 ;
 
         http.oauth2Login()
-                .userInfoEndpoint()
-                .userService(oAuthService)
+                .tokenEndpoint()
+                .accessTokenResponseClient(tokenResponseClient())
                 ;
 
         http.authorizeRequests()
@@ -52,5 +51,10 @@ public class SecurityConfig<s extends Session> extends WebSecurityConfigurerAdap
     @Bean
     SpringSessionBackedSessionRegistry<?> sessionRegistry() {
         return new SpringSessionBackedSessionRegistry<>(sessionRepository);
+    }
+
+    @Bean
+    TokenResponseClient tokenResponseClient() {
+        return new TokenResponseClient();
     }
 }
