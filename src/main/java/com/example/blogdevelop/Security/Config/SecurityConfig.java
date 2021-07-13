@@ -32,11 +32,6 @@ public class SecurityConfig<s extends Session> extends WebSecurityConfigurerAdap
                 .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                 ;
 
-        http.oauth2Login()
-                .tokenEndpoint()
-                .accessTokenResponseClient(tokenResponseClient())
-                ;
-
         http.authorizeRequests()
                 .antMatchers("/").permitAll()
                 .anyRequest().authenticated()

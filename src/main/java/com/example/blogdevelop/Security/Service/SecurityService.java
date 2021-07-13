@@ -49,8 +49,6 @@ public class SecurityService {
                 .build();
     }
 
-    // redirect-url으로 프론트에게 access token을 보내고, 프론트는 access token을 서버로 보낸다.
-    // TODO: 서버는 받은 access token을 가지고, Social scope를 여기서 Session 객체에 저장한다(userinfo.profile에 요청을 보내서 유저 정보를 얻어온다)
     public OAuthResponse googleAuthentication(String accessToken) throws NotSerializableException {
         // 유저 정보를 가져옴
         UserDto userDto = userInfo(accessToken);
