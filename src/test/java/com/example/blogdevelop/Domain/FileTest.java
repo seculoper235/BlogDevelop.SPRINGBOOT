@@ -1,7 +1,6 @@
 package com.example.blogdevelop.Domain;
 
 import com.example.blogdevelop.Repository.FileRepository;
-import lombok.extern.log4j.Log4j;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
 import org.junit.Test;

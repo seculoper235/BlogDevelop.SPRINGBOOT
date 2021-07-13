@@ -3,6 +3,7 @@ package com.example.blogdevelop.Domain;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -28,7 +29,7 @@ public class Post {
     private User user;
 
     @OneToMany(mappedBy = "post")
-    private List<PostImage> postImageList;
+    private List<PostImage> postImageList = new ArrayList<>();
 
     @Builder
     public Post(int id, String title, String content, Category category, User user, List<PostImage> postImageList) {
