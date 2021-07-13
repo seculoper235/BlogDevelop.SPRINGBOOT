@@ -24,6 +24,7 @@ public class UserImage {
     private File file;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "type")
     private ImageType imageType;
 
     @Builder
