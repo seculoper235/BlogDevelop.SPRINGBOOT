@@ -1,7 +1,6 @@
 package com.example.blogdevelop.Domain;
 
 import com.example.blogdevelop.Repository.FileRepository;
-import com.example.blogdevelop.Repository.UserImageRepository;
 import com.example.blogdevelop.Repository.UserRepository;
 import com.example.blogdevelop.Web.Dto.ImageType;
 import lombok.extern.slf4j.Slf4j;

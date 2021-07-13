@@ -4,9 +4,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Getter
@@ -24,16 +22,18 @@ public class User {
     private String description;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "authority")
     private UserAuthority userAuthority;
 
     @OneToMany(mappedBy = "user")
     private List<Post> postList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user")
-    private List<UserImage> userImageList = new ArrayList<>();
+    @OneToOne
+    @JoinColumn(name = "file_id")
+    private File profile;
 
     @Builder
-    public User(String id, String username, String password, String email, String description, UserAuthority userAuthority, List<Post> postList, List<UserImage> userImageList) {
+    public User(String id, String username, String password, String email, String description, UserAuthority userAuthority, List<Post> postList, File profile) {
         this.id = id;
         this.username = username;
         this.password = password;
@@ -41,6 +41,6 @@ public class User {
         this.description = description;
         this.userAuthority = userAuthority;
         this.postList = postList;
-        this.userImageList = userImageList;
+        this.profile = profile;
     }
 }
