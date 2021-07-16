@@ -34,14 +34,18 @@ public class SecurityService {
     private final HttpSession httpSession;
     private final ObjectMapper objectMapper;
 
+    // Redis 대신에 임시 저장소를 사용하고, 세션 ID 대신에 access token을 사용
     public OAuthResponse registerUserInfo(RegistInfo registInfo) {
-        // TODO: User로 toEntity 후 저장
+        // TODO: 세션 ID가 아닌 access token을 활용하여 OAuth 유저 정보를 가져옴
         SessionUser.Google googleUser = (SessionUser.Google) httpSession.getAttribute("googleUser");
         if(googleUser == null) {
             throw new NoSuchElementException();
         }
+
+        // TODO: OAuth 유저 정보를 RegistInfo 에다 집어넣음
         registInfo.setUpInfo(googleUser);
 
+        // TODO: RegistInfo를 User 엔티티에다 넣고 DB 저장
         User user = userRepository.save(InfoMapper.toEntity(registInfo));
         return OAuthResponse.builder()
                 .nickName(user.getId())

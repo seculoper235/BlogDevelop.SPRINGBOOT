@@ -8,12 +8,14 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class OAuthResponse {
     private String nickName;
+    private String session;
     private String oAuthToken;
     private boolean isRegistered;
 
     @Builder
-    public OAuthResponse(String nickName, String oAuthToken, boolean isRegistered) {
+    public OAuthResponse(String nickName, String session, String oAuthToken, boolean isRegistered) {
         this.nickName = nickName;
+        this.session = session;
         this.oAuthToken = oAuthToken;
         this.isRegistered = isRegistered;
     }
