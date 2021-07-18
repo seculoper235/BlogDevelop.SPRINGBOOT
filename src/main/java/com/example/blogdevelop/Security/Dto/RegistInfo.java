@@ -24,9 +24,9 @@ public class RegistInfo {
 
     // 빌더 생성자
     @Builder
-    public void setUpInfo(SessionUser.Google googleUser) {
-        this.username = googleUser.getName();
-        this.email = googleUser.getEmail();
-        this.image = googleUser.getImage();
+    public void setUpInfo(UserDto userDto) {
+        this.username = userDto.getUsername();
+        this.email = userDto.getEmail();
+        this.image = userDto.getImage();
     }
 }
