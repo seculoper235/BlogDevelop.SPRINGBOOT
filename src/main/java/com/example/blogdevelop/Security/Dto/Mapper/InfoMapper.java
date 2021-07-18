@@ -7,11 +7,11 @@ import com.example.blogdevelop.Security.Dto.RegistInfo;
 public class InfoMapper {
     public static User toEntity(RegistInfo registInfo) {
         return User.builder()
-                .id(registInfo.getNickName())
-                .password("1234")
-                .username(registInfo.getUsername())
+                .id(registInfo.getUsername())
+                .password(registInfo.getUsername())
+                .username(registInfo.getNickName())
                 .email(registInfo.getEmail())
-                .description(registInfo.getDescription())
+                .description(registInfo.getImage())
                 .userAuthority(UserAuthority.USER)
                 .build()
                 ;
