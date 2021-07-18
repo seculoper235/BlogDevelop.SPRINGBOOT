@@ -19,6 +19,9 @@ target/
 *.iml
 *.ipr
 *.uml
+src/main/java/com/example/blogdevelop/Diagram/**
+src/main/resources/*
+!src/main/resources/application.properties
 
 ### NetBeans ###
 /nbproject/private/
@@ -29,10 +32,6 @@ target/
 build/
 !**/src/main/**/build/
 !**/src/test/**/build/
-src/main/java/com/example/blogdevelop/Diagram/**
-src/main/resources/application-oauth.properties
-src/main/resources/application-redis.properties
-src/main/resources/update.txt
 
 ### VS Code ###
 .vscode/
