@@ -15,7 +15,7 @@ public class JwtFilter extends GenericFilterBean {
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-        //
+        // TODO: HwtProvider로 JWT 검증 후, Authentication을 생성하여 SecurityContext에 저장
 
         filterChain.doFilter(servletRequest, servletResponse);
     }
