@@ -1,4 +1,4 @@
-package com.example.blogdevelop.Web.Dto;
+package com.example.blogdevelop.Web.Setting.Dto;
 
 public enum ImageType {
     NONE,
