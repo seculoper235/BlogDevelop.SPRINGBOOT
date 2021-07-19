@@ -2,6 +2,7 @@ package com.example.blogdevelop.Security.Service;
 
 import com.example.blogdevelop.Domain.User;
 import com.example.blogdevelop.Repository.UserRepository;
+import com.example.blogdevelop.Security.Config.JwtProvider;
 import com.example.blogdevelop.Security.Dto.Mapper.InfoMapper;
 import com.example.blogdevelop.Security.Dto.OAuthResponse;
 import com.example.blogdevelop.Security.Dto.RegistInfo;
@@ -10,11 +11,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -23,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @PropertySource({"classpath:application-oauth.properties"})
@@ -33,6 +38,7 @@ public class SecurityService {
     private final UserRepository userRepository;
     private final ObjectMapper objectMapper;
     private final HashMap<String, UserDto> oAuthStorage;
+    private final JwtProvider jwtProvider;
 
     /* Redis 대신에 임시 저장소를 사용하고, 세션 ID 대신에 access token을 사용 */
 
@@ -68,11 +74,11 @@ public class SecurityService {
     }
 
     private OAuthResponse createJwtToken(String username) {
-        // TODO: JwtProvider 구현
+        // JwtProvider 구현
         List<String> authorities = userRepository.findById(username).stream()
                 .map(e -> e.getUserAuthority().name())
                 .collect(Collectors.toList());
-        String jwtToken = null;
+        String jwtToken = jwtProvider.createJwt(username, authorities);
 
         return OAuthResponse.builder()
                 .nickName(username)
@@ -115,6 +121,15 @@ public class SecurityService {
                     .build();
         } catch (JsonProcessingException e) {
             throw new NotSerializableException();
+        }
+    }
+
+    public void logoutUser() {
+        if(SecurityContextHolder.getContext().getAuthentication() instanceof AnonymousAuthenticationToken)
+            log.error("토큰이 존재하지 않습니다");
+        else {
+            SecurityContextHolder.clearContext();
+            log.info("로그아웃 되었습니다");
         }
     }
 }

@@ -24,7 +24,12 @@ public class SecurityController {
     // 추가 사용자 정보를 등록하기 위한 API
     @PostMapping("/regist")
     public OAuthResponse registUserInfo(@RequestBody RegistInfo registInfo) {
-        // TODO: 사용자 등록 과정으로, 인증이 완료된 후에 유저 정보를 채움
         return securityService.registerUserInfo(registInfo);
+    }
+
+    // 로그 아웃
+    @GetMapping("/logoutProc")
+    public void logoutUser() {
+        securityService.logoutUser();
     }
 }
