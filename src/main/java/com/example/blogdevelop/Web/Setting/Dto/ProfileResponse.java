@@ -2,14 +2,16 @@ package com.example.blogdevelop.Web.Setting.Dto;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
+@Setter
 public class ProfileResponse {
-    private final String id;
-    private final String profile;
-    private final String nickName;
-    private final String email;
-    private final String description;
+    private String id;
+    private String profile;
+    private String nickName;
+    private String email;
+    private String description;
 
     @Builder
     public ProfileResponse(String id, String profile, String nickName, String email, String description) {
