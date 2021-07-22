@@ -8,6 +8,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.constraints.NotNull;
+import java.io.IOException;
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -28,10 +31,8 @@ public class MyController {
     }
 
     // 프로필 이미지 변경
-    // TODO 이미지 변경 메소드 작성 필요
-    @PutMapping("/user/{id}/image")
-    public ProfileResponse updateProfileImage(@PathVariable(name = "id") String userId, @RequestParam MultipartFile profileImage) {
-        //
+    @PostMapping("/user/{id}/image")
+    public ProfileResponse updateProfileImage(@PathVariable(name = "id") String userId, @RequestParam @NotNull MultipartFile profileImage) throws IOException {
         return myService.updateProfileImage(userId, profileImage);
     }
 

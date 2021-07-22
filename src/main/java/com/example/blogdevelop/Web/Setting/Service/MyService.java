@@ -2,6 +2,7 @@ package com.example.blogdevelop.Web.Setting.Service;
 
 import com.example.blogdevelop.Domain.User;
 import com.example.blogdevelop.Repository.UserRepository;
+import com.example.blogdevelop.Util.FileService;
 import com.example.blogdevelop.Web.Setting.Dto.Mapper.UserMapper;
 import com.example.blogdevelop.Web.Setting.Dto.ProfileRequest;
 import com.example.blogdevelop.Web.Setting.Dto.ProfileResponse;
@@ -12,6 +13,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.NoSuchElementException;
 
 @Slf4j
@@ -19,6 +21,7 @@ import java.util.NoSuchElementException;
 @RequiredArgsConstructor
 public class MyService {
     private final UserRepository userRepository;
+    private final FileService fileService;
 
     // 프로필 조회
     public ProfileResponse selectProfile(String userId) {
@@ -41,10 +44,11 @@ public class MyService {
     }
 
     // 프로필 이미지 수정
-    // TODO MultipartFile 업로드 처리 필요
-    public ProfileResponse updateProfileImage(String userId, MultipartFile profileImage) {
-        //
-        return null;
+    public ProfileResponse updateProfileImage(String userId, MultipartFile profileImage) throws IOException {
+        String fileName = fileService.upload(userId, profileImage);
+        ProfileResponse profile = selectProfile(userId);
+        profile.setProfile(fileName);
+        return profile;
     }
 
     public void deleteUser(String userId) {
