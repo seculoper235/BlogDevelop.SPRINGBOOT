@@ -50,6 +50,7 @@ public class SecurityService {
         registInfo.setUpInfo(userDto);
 
         // RegistInfo를 User 엔티티에다 넣고 DB 저장
+        // TODO picture 필드는 File 엔티티를 새로 생성하여 저장(업로드 필요 X)
         User user = userRepository.save(InfoMapper.toEntity(registInfo));
 
         // createJwtToken() 실행

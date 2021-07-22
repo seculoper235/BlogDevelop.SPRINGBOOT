@@ -10,6 +10,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @EqualsAndHashCode(of = "id")
 @Table(name = "file")
+// TODO ImageType 필드 추가
 public class File {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;

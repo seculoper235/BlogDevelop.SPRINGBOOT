@@ -32,4 +32,21 @@ public class SecurityController {
     public void logoutUser() {
         securityService.logoutUser();
     }
+
+    // 테스트 메소드
+    @GetMapping("/test")
+    public String uploadTest() {
+        return "<html lang=\"en\">\n" +
+                "  <head>\n" +
+                "    <meta charset=\"UTF-8\">\n" +
+                "    <title>파일 보내기 예제</title>\n" +
+                "  </head>\n" +
+                "  <body>\n" +
+                "    <form name=\"form\" method=\"post\" action=\"http://localhost:8080/profile/user/user1/image\" enctype=\"multipart/form-data\">\n" +
+                "      <input type=\"file\" name=\"profileImage\" multiple=\"multiple\"/>\n" +
+                "      <input type=\"submit\" id=\"submit\" value=\"전송\"/>\n" +
+                "    </form>\n" +
+                "  </body>\n" +
+                "</html>";
+    }
 }
