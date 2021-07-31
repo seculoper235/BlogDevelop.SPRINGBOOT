@@ -1,5 +1,6 @@
 package com.example.blogdevelop.Domain;
 
+import com.example.blogdevelop.Web.Setting.Dto.ImageType;
 import lombok.*;
 
 import javax.persistence.*;
@@ -10,7 +11,6 @@ import javax.persistence.*;
 @NoArgsConstructor
 @EqualsAndHashCode(of = "id")
 @Table(name = "file")
-// TODO ImageType 필드 추가
 public class File {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -23,14 +23,18 @@ public class File {
 
     private String contentType;
 
+    @Enumerated(EnumType.STRING)
+    private ImageType imageType;
+
     private int deleteFlag;
 
     @Builder
-    public File(int id, String name, String saveName, String contentType, int deleteFlag) {
+    public File(int id, String name, String saveName, String contentType, ImageType imageType, int deleteFlag) {
         this.id = id;
         this.name = name;
         this.saveName = saveName;
         this.contentType = contentType;
+        this.imageType = imageType;
         this.deleteFlag = deleteFlag;
     }
 }
