@@ -3,6 +3,7 @@ package com.example.blogdevelop.Web.Setting.Service;
 import com.example.blogdevelop.Domain.User;
 import com.example.blogdevelop.Repository.UserRepository;
 import com.example.blogdevelop.Util.FileService;
+import com.example.blogdevelop.Web.Setting.Dto.ImageType;
 import com.example.blogdevelop.Web.Setting.Dto.Mapper.UserMapper;
 import com.example.blogdevelop.Web.Setting.Dto.ProfileRequest;
 import com.example.blogdevelop.Web.Setting.Dto.ProfileResponse;
@@ -45,7 +46,7 @@ public class MyService {
 
     // 프로필 이미지 수정
     public ProfileResponse updateProfileImage(String userId, MultipartFile profileImage) throws IOException {
-        String fileName = fileService.upload(userId, profileImage);
+        String fileName = fileService.uploadProfile(userId, ImageType.PROFILE, profileImage);
         ProfileResponse profile = selectProfile(userId);
         profile.setProfile(fileName);
         return profile;
