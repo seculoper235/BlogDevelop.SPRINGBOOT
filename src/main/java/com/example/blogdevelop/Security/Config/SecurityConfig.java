@@ -8,6 +8,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.filter.CorsFilter;
 
 
 @Configuration
@@ -15,11 +16,14 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final JwtProvider jwtProvider;
+    private final CorsFilter corsFilter;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.httpBasic().disable();
         http.csrf().disable();
+
+        http.addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class);
 
         http.sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
