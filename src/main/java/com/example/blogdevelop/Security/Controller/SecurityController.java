@@ -4,13 +4,16 @@ import com.example.blogdevelop.Security.Dto.OAuthResponse;
 import com.example.blogdevelop.Security.Dto.RegistInfo;
 import com.example.blogdevelop.Security.Service.SecurityService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.NotSerializableException;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(value = "/auth")
+@RequestMapping(value = "/auth", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 public class SecurityController {
     private final SecurityService securityService;
 
