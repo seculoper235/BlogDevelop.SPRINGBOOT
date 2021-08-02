@@ -5,8 +5,10 @@ import com.example.blogdevelop.Repository.UserRepository;
 import com.example.blogdevelop.Web.Setting.Dto.ImageType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.tomcat.util.http.fileupload.InvalidFileNameException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -32,6 +34,7 @@ public class FileService {
         // 원본 파일 이름
         String originFilename = multipartFile.getOriginalFilename();
         // 업로드 용 파일 이름
+        assert originFilename != null;
         String fileName = getFileName(originFilename);
 
         // FileDto 객체 생성
@@ -54,8 +57,7 @@ public class FileService {
     // TODO MultipartFile 리스트 업로드
     public String uploadPosts(ImageType imageType, List<MultipartFile> multipartFiles, Integer postId) throws IOException {
 
-        for (MultipartFile multipartFile :
-                multipartFiles) {
+        for (MultipartFile multipartFile : multipartFiles) {
             // 원본 파일 이름
             String originFilename = multipartFile.getOriginalFilename();
 
@@ -86,8 +88,10 @@ public class FileService {
         String filePath = imageType == ImageType.POST ? "/posts" +catId+ "/" +postId : "/profiles";
 
         // TODO 가입과 동시에 {user_id}/profile 폴더 생성
-        if (!new File(absolutePath, userId+filePath).exists())
-            new File(absolutePath, userId+filePath).mkdir();
+        if (!new File(absolutePath, userId+filePath).exists()) {
+            if(!new File(absolutePath, userId+filePath).mkdir())
+                throw new InvalidFileNameException(absolutePath+"/"+userId+filePath, "잘못된 파일 경로입니다.");
+        }
 
         return filePath;
     }
