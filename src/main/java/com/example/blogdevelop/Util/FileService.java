@@ -1,5 +1,6 @@
 package com.example.blogdevelop.Util;
 
+import com.example.blogdevelop.Domain.Post;
 import com.example.blogdevelop.Repository.FileRepository;
 import com.example.blogdevelop.Repository.UserRepository;
 import com.example.blogdevelop.Web.Setting.Dto.ImageType;
@@ -24,13 +25,21 @@ public class FileService {
     private final FileRepository fileRepository;
     private final UserRepository userRepository;
 
-    @Value("${file.upload}")
+    @Value("${absolute.upload}")
     private String absolutePath;
+    @Value("${profiles.upload}")
+    private String profilePath;
+    @Value("${about.upload}")
+    private String aboutPath;
+    @Value("${posts.upload}")
+    private String postPath;
 
     // TODO 파일의 ImageType(용도)에 따라 업로드를 다르게 진행(profile, post)
     // TODO Post와 Profile에 따라 다른 upload 메소드를 진행한다(Post는 다수의 MultipartFile을 다루므로 List<> 객체로 받고, Profile은 하나이므로 단일 객체를 받는다)
     // 프로필 이미지 업로드
     public String uploadProfile(String userId, ImageType imageType, MultipartFile multipartFile) throws IOException {
+        // 폴더 경로
+        String filePath = userId+ profilePath;
         // 원본 파일 이름
         String originFilename = multipartFile.getOriginalFilename();
         // 업로드 용 파일 이름
@@ -38,7 +47,6 @@ public class FileService {
         String fileName = getFileName(originFilename);
 
         // FileDto 객체 생성
-        String filePath = createSavePath(ImageType.PROFILE, userId, null, null);
         FileDto fileDto = FileDto.builder()
                 .fileName(fileName)
                 .contentType(multipartFile.getContentType())
@@ -55,7 +63,10 @@ public class FileService {
     }
 
     // TODO MultipartFile 리스트 업로드
-    public String uploadPosts(ImageType imageType, List<MultipartFile> multipartFiles, Integer postId) throws IOException {
+    public String uploadPosts(ImageType imageType, List<MultipartFile> multipartFiles, String userId, int catId, int postId) throws IOException {
+        // 저장 폴더 생성
+        categoryFilePath(userId, catId);
+        String filePath = postFilePath(userId, catId, postId);
 
         for (MultipartFile multipartFile : multipartFiles) {
             // 원본 파일 이름
@@ -65,7 +76,6 @@ public class FileService {
             String fileName = getFileName(originFilename);
 
             // FileDto 객체 생성
-            String filePath = createSavePath(ImageType.PROFILE, null, null, postId);
             FileDto fileDto = FileDto.builder()
                     .fileName(fileName)
                     .contentType(multipartFile.getContentType())
@@ -83,17 +93,40 @@ public class FileService {
         return null;
     }
 
-    // TODO ImageType에 따라 폴더 생성이 나뉨
-    private String createSavePath(ImageType imageType, String userId, Integer catId, Integer postId) {
-        String filePath = imageType == ImageType.POST ? "/posts" +catId+ "/" +postId : "/profiles";
+    // 회원 가입 후, 바로 생성되는 업로드 폴더들을 생성
+    public void initFilePath(String userId, String filePath) {
+        createFilePath(userId, null);
+        createFilePath(userId, profilePath);
+        createFilePath(userId, aboutPath);
+        createFilePath(userId, postPath);
+    }
 
-        // TODO 가입과 동시에 {user_id}/profile 폴더 생성
+    // 포스트 생성 시 실행되는 메소드
+    private String categoryFilePath(String userId, int catId) {
+        String path = postPath+ "/" +catId;
+        return createFilePath(userId, path);
+    }
+
+    // 포스트 생성 시 실행되는 메소드
+    public String postFilePath(String userId, int catId, int postId) {
+        String path = postPath+ "/" +catId+ "/" +postId;
+        return createFilePath(userId, path);
+    }
+
+    private String createFilePath(String userId, String filePath) {
         if (!new File(absolutePath, userId+filePath).exists()) {
             if(!new File(absolutePath, userId+filePath).mkdir())
                 throw new InvalidFileNameException(absolutePath+"/"+userId+filePath, "잘못된 파일 경로입니다.");
         }
 
         return filePath;
+    }
+
+    // 포스트 파일 하나를 저장
+    private com.example.blogdevelop.Domain.File savePostFiles(String catId, String postImageId, MultipartFile multipartFile, FileDto fileDto) {
+        // PostImage 테이블에서 파일들 조회
+
+        return null;
     }
 
     private com.example.blogdevelop.Domain.File saveProfileFile(String userId, MultipartFile multipartFile, FileDto fileDto) throws IOException {
@@ -109,6 +142,7 @@ public class FileService {
         }
 
         // 지정된 경로에 파일 업로드
+        // TODO 만약 이 과정에서 없다면 폴더를 생성(오류를 이용해 처리하는 것은 좋지 못한 방법이다. 제대로 처리할 수 없기 때문)
         multipartFile.transferTo(new File(absolutePath, userId +"/"+ fileDto.getPath()));
 
         // file 수정 후 DB 저장
