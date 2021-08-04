@@ -9,6 +9,7 @@ public class FileMapper {
                 .name(fileDto.getFileName())
                 .saveName(fileDto.getPath())
                 .contentType(fileDto.getContentType())
+                .post(fileDto.getPost())
                 .build();
     }
 }

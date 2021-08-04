@@ -26,15 +26,20 @@ public class File {
     @Enumerated(EnumType.STRING)
     private ImageType imageType;
 
-    private int deleteFlag;
+    private boolean deleteFlag;
+
+    @ManyToOne
+    @JoinColumn(name = "post_id")
+    private Post post;
 
     @Builder
-    public File(int id, String name, String saveName, String contentType, ImageType imageType, int deleteFlag) {
+    public File(int id, String name, String saveName, String contentType, ImageType imageType, boolean deleteFlag, Post post) {
         this.id = id;
         this.name = name;
         this.saveName = saveName;
         this.contentType = contentType;
         this.imageType = imageType;
         this.deleteFlag = deleteFlag;
+        this.post = post;
     }
 }

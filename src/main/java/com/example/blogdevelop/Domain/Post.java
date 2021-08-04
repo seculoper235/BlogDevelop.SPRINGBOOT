@@ -23,21 +23,20 @@ public class Post {
     @JoinColumn(name = "category_id")
     private Category category;
 
-    //
-   @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
     @OneToMany(mappedBy = "post")
-    private List<PostImage> postImageList = new ArrayList<>();
+    private List<File> fileList = new ArrayList<>();
 
     @Builder
-    public Post(int id, String title, String content, Category category, User user, List<PostImage> postImageList) {
+    public Post(int id, String title, String content, Category category, User user, List<File> fileList) {
         this.id = id;
         this.title = title;
         this.content = content;
         this.category = category;
         this.user = user;
-        this.postImageList = postImageList;
+        this.fileList = fileList;
     }
 }
