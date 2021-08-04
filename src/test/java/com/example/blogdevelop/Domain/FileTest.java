@@ -67,7 +67,7 @@ public class FileTest {
         assertEquals("파일2", resultFile.getName());
         assertEquals(expectedFile.getSaveName(), resultFile.getSaveName());
         assertEquals(expectedFile.getContentType(), resultFile.getContentType());
-        assertEquals(expectedFile.getDeleteFlag(), resultFile.getDeleteFlag());
+        assertEquals(expectedFile.isDeleteFlag(), resultFile.isDeleteFlag());
     }
 
     @DisplayName("삭제 테스트(저장 테스트를 먼저 진행할 것!)")
