@@ -70,10 +70,11 @@ public class FileService {
         String filePath = postFilePath(userId, catId, postId);
 
         // 대상 포스트 조회
-        Post post = postRepository.findById(postId).get();
+        Post post = postRepository.findById(postId)
+                .orElseThrow();
 
-        // FileDto 들을 담을 리스트 생성
-        List<FileDto> fileDtoList = new ArrayList<>();
+        // 업로드 된 File 들을 담을 리스트 생성
+        List<com.example.blogdevelop.Domain.File> uploadFileList = new ArrayList<>();
 
         for (MultipartFile multipartFile : multipartFiles) {
             // 원본 파일 이름
@@ -91,16 +92,16 @@ public class FileService {
                     .post(post)
                     .build();
 
-            // 리스트에 저장
-            fileDtoList.add(fileDto);
-        }
+            // 업로드 경로를 가지고 파일을 서버에 저장
+            com.example.blogdevelop.Domain.File uploadFile = savePostFile(multipartFile, fileDto);
 
-        // 업로드 경로를 가지고 파일을 서버에 저장
-        List<com.example.blogdevelop.Domain.File> fileList = savePostFiles(catId, postId, multipartFiles, fileDtoList);
+            // 리스트에 추가
+            uploadFileList.add(uploadFile);
+        }
 
         // 서버 상에 이미지가 저장된 경로를 반환
         // (서버 BASE_URL + File 엔티티.saveName)
-        return fileList.stream()
+        return uploadFileList.stream()
                 .map(com.example.blogdevelop.Domain.File::getName)
                 .collect(Collectors.toList());
     }
@@ -156,24 +157,14 @@ public class FileService {
     }
 
     // 포스트 파일 하나를 저장
-    // TODO 현재 메소드는 업로드 메소드 이므로, deleteFlag = 1로만 바꾼다. 파일 폴더 삭제는 따로 구현한다
-    private List<com.example.blogdevelop.Domain.File> savePostFiles(int catId, int postId, List<MultipartFile> multipartFiles, List<FileDto> fileDtos) throws IOException {
-        // 새로 저장할 파일 리스트
-        List<com.example.blogdevelop.Domain.File> resultFileList = new ArrayList<>();
+    private com.example.blogdevelop.Domain.File savePostFile(MultipartFile multipartFile, FileDto fileDto) throws IOException {
+        // fileDto를 가지고, 지정된 경로에 멀티 파일 업로드
+        multipartFile.transferTo(new File(absolutePath, fileDto.getPath()));
 
-        // 파일이 하나도 없으므로 새로 생성
-        for (int i = 0; i < multipartFiles.size(); i++) {
-            // TODO fileDto를 가지고, 지정된 경로에 멀티 파일 업로드
-            multipartFiles.get(i).transferTo(new File(absolutePath, fileDtos.get(i).getPath()));
+        // FileDto를 File 엔티티로 변환 후 저장
+        com.example.blogdevelop.Domain.File file = FileMapper.toEntity(fileDto);
 
-            // TODO FileDto를 File 엔티티로 변환 후 저장
-            com.example.blogdevelop.Domain.File uploadFile = FileMapper.toEntity(fileDtos.get(i));
-
-            // 파일 리스트에 추가
-            resultFileList.add(uploadFile);
-        }
-
-        return resultFileList;
+        return fileRepository.save(file);
     }
 
     // 업로드 삭제 버튼 클릭 시, 실행되는 메소드
