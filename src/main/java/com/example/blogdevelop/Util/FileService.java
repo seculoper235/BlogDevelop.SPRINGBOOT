@@ -36,8 +36,7 @@ public class FileService {
     @Value("${posts.upload}")
     private String postPath;
 
-    // TODO 파일의 ImageType(용도)에 따라 업로드를 다르게 진행(profile, post)
-    // TODO Post와 Profile에 따라 다른 upload 메소드를 진행한다(Post는 다수의 MultipartFile을 다루므로 List<> 객체로 받고, Profile은 하나이므로 단일 객체를 받는다)
+
     // 프로필 이미지 업로드
     public String uploadProfile(String userId, ImageType imageType, MultipartFile multipartFile) throws IOException {
         // 폴더 경로
@@ -60,7 +59,6 @@ public class FileService {
         com.example.blogdevelop.Domain.File file = saveProfileFile(userId, multipartFile, fileDto);
 
         // 서버 상에 이미지가 저장된 경로를 반환
-        // (서버 BASE_URL + File 엔티티.saveName)
         return file.getName();
     }
 
@@ -100,7 +98,6 @@ public class FileService {
         }
 
         // 서버 상에 이미지가 저장된 경로를 반환
-        // (서버 BASE_URL + File 엔티티.saveName)
         return uploadFileList.stream()
                 .map(com.example.blogdevelop.Domain.File::getName)
                 .collect(Collectors.toList());
@@ -177,7 +174,7 @@ public class FileService {
     }
 
     // 포스트 저장 후, 바로 실행되는 업로드 파일 삭제 메소드
-    public void deletePostFile(String userId, int postId) {
+    public void deletePostFile(int postId) {
         // 현재 존재하는 파일 리스트
         List<com.example.blogdevelop.Domain.File> fileList = fileRepository.findAllByPostId(postId);
 
@@ -187,9 +184,10 @@ public class FileService {
             fileRepository.deleteAllByPost_Id(postId);
 
             // 해당 업로드 파일을 파일 경로에서 삭제
-            fileList.stream().map(
-                    file -> new File(absolutePath, file.getSaveName()).delete()
-            ).close();
+            for (com.example.blogdevelop.Domain.File file : fileList) {
+                if(!new File(absolutePath, file.getSaveName()).delete())
+                    throw new InvalidFileNameException(absolutePath+ file.getSaveName(), "잘못된 파일 경로입니다.");
+            }
         }
     }
 
