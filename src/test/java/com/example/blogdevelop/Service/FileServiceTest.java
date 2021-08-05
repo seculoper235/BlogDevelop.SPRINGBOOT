@@ -1,24 +1,28 @@
 package com.example.blogdevelop.Service;
 
-import com.example.blogdevelop.Domain.User;
 import com.example.blogdevelop.Repository.FileRepository;
 import com.example.blogdevelop.Repository.PostRepository;
 import com.example.blogdevelop.Repository.UserRepository;
 import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.File;
 import java.util.List;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 
 @RunWith(SpringRunner.class)
+@DataJpaTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class FileServiceTest {
-    @MockBean
+    @Autowired
     private FileRepository fileRepository;
 
     @MockBean
@@ -85,8 +89,28 @@ public class FileServiceTest {
     }
 
     @Test
-    @DisplayName("포스트 파일들 업로드 테스트")
-    public void upload_PostFiles_Test() {
-        //
+    @DisplayName("포스트 파일들 업로드 삭제 테스트")
+    public void delete_UploadPostFiles_Test() {
+        // 주어지는 파라미터
+        int postId = 12;
+
+        // 현재 존재하는 파일 리스트
+        List<com.example.blogdevelop.Domain.File> fileList = fileRepository.findAllByPostId(12);
+
+        // 파일이 존재한다면, 삭제 대상인 파일들을 모두 삭제
+        if(!fileList.isEmpty()) {
+            // 테이블 데이터 모두 삭제
+            fileRepository.deleteAllByPost_Id(postId);
+
+            if(fileRepository.findAllByPostId(postId).isEmpty())
+                System.out.println("테이블 데이터 삭제 성공!");
+
+
+            // 해당 업로드 파일을 파일 경로에서 삭제
+            for (com.example.blogdevelop.Domain.File file : fileList) {
+                if(new File(absolutePath, file.getSaveName()).delete())
+                    System.out.println("업로드 파일 삭제 성공!");
+            }
+        }
     }
 }
