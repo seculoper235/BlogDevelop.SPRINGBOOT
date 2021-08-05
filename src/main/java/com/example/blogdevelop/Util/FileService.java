@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.http.fileupload.InvalidFileNameException;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,7 +17,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -102,7 +100,6 @@ public class FileService {
 
         // 서버 상에 이미지가 저장된 경로를 반환
         // (서버 BASE_URL + File 엔티티.saveName)
-        //return file.getName();
         return fileList.stream()
                 .map(com.example.blogdevelop.Domain.File::getName)
                 .collect(Collectors.toList());
@@ -140,14 +137,14 @@ public class FileService {
         com.example.blogdevelop.Domain.File file = user.getProfile();
 
         // 기존 파일이 존재한다면 삭제
-        File origin = new File(absolutePath, userId + file.getSaveName());
+        File origin = new File(absolutePath, file.getSaveName());
         if(origin.exists()) {
             origin.delete();
             log.info("파일 삭제 성공!");
         }
 
         // 지정된 경로에 파일 업로드
-        multipartFile.transferTo(new File(absolutePath, userId +"/"+ fileDto.getPath()));
+        multipartFile.transferTo(new File(absolutePath, fileDto.getPath()));
 
         // file 수정 후 DB 저장
         file.setName(fileDto.getFileName());
@@ -159,26 +156,15 @@ public class FileService {
     }
 
     // 포스트 파일 하나를 저장
+    // TODO 현재 메소드는 업로드 메소드 이므로, deleteFlag = 1로만 바꾼다. 파일 폴더 삭제는 따로 구현한다
     private List<com.example.blogdevelop.Domain.File> savePostFiles(int catId, int postId, List<MultipartFile> multipartFiles, List<FileDto> fileDtos) throws IOException {
-        // 현재 존재하는 파일 리스트
-        List<com.example.blogdevelop.Domain.File> fileList = fileRepository.findAllByPostId(postId);
-
         // 새로 저장할 파일 리스트
         List<com.example.blogdevelop.Domain.File> resultFileList = new ArrayList<>();
-
-        // 파일이 존재한다면, 파일을 모두 삭제한 다음 다시 새로 업로드
-        if(!fileList.isEmpty()) {
-            // 테이블 데이터 모두 삭제
-            fileRepository.deleteAllByPost_Id(postId);
-            // 업로드 데이터 모두 삭제
-            Arrays.stream(Objects.requireNonNull(new File(absolutePath, "/posts/" + catId + "/" + postId).listFiles()))
-                    .map((Function<File, Object>) File::delete);
-        }
 
         // 파일이 하나도 없으므로 새로 생성
         for (int i = 0; i < multipartFiles.size(); i++) {
             // TODO fileDto를 가지고, 지정된 경로에 멀티 파일 업로드
-            multipartFiles.get(i).transferTo(new File(absolutePath, postPath+ "/" + catId + "/" + postId));
+            multipartFiles.get(i).transferTo(new File(absolutePath, fileDtos.get(i).getPath()));
 
             // TODO FileDto를 File 엔티티로 변환 후 저장
             com.example.blogdevelop.Domain.File uploadFile = FileMapper.toEntity(fileDtos.get(i));
@@ -188,6 +174,32 @@ public class FileService {
         }
 
         return resultFileList;
+    }
+
+    // 업로드 삭제 버튼 클릭 시, 실행되는 메소드
+    public com.example.blogdevelop.Domain.File setDeleteFlag(String filename) {
+        // deleteFlag = 1로 바꿈
+        com.example.blogdevelop.Domain.File file = fileRepository.findByName(filename);
+        file.setDeleteFlag(true);
+
+        return fileRepository.save(file);
+    }
+
+    // 포스트 저장 후, 바로 실행되는 업로드 파일 삭제 메소드
+    public void deletePostFile(String userId, int postId) {
+        // 현재 존재하는 파일 리스트
+        List<com.example.blogdevelop.Domain.File> fileList = fileRepository.findAllByPostId(postId);
+
+        // 파일이 존재한다면, 삭제 대상인 파일들을 모두 삭제
+        if(!fileList.isEmpty()) {
+            // 테이블 데이터 모두 삭제
+            fileRepository.deleteAllByPost_Id(postId);
+
+            // 해당 업로드 파일을 파일 경로에서 삭제
+            fileList.stream().map(
+                    file -> new File(absolutePath, file.getSaveName()).delete()
+            ).close();
+        }
     }
 
     private String getFileName(String originFilename) {
