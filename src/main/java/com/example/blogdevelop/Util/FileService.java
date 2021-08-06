@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class FileService {
+    // TODO 레포지토리 의존성을 줄일 것
     private final FileRepository fileRepository;
     private final UserRepository userRepository;
     private final PostRepository postRepository;
@@ -65,7 +66,7 @@ public class FileService {
     // TODO MultipartFile 리스트 업로드
     public List<String> uploadPosts(ImageType imageType, List<MultipartFile> multipartFiles, String userId, int catId, int postId) throws IOException {
         // 저장 폴더 생성
-        String filePath = postFilePath(userId, catId, postId);
+        String filePath = postFilePath(userId, postId);
 
         // 대상 포스트 조회
         Post post = postRepository.findById(postId)
@@ -109,8 +110,8 @@ public class FileService {
     }
 
     // 포스트 생성 시 실행되는 메소드
-    public String postFilePath(String userId, int catId, int postId) {
-        String path = postPath+ "/" +catId+ "/" +postId;
+    public String postFilePath(String userId, int postId) {
+        String path = postPath+ "/" +postId;
         return createFilePath(userId, path);
     }
 
@@ -120,12 +121,13 @@ public class FileService {
     }
 
     private String createFilePath(String userId, String filePath) {
-        if (!new File(absolutePath, userId+filePath).exists()) {
-            if(!new File(absolutePath, userId+filePath).mkdirs())
+        String dirPath = userId+filePath;
+        if (!new File(absolutePath, dirPath).exists()) {
+            if(!new File(absolutePath, dirPath).mkdirs())
                 throw new InvalidFileNameException(absolutePath+"/"+userId+filePath, "잘못된 파일 경로입니다.");
         }
 
-        return filePath;
+        return dirPath;
     }
 
     private com.example.blogdevelop.Domain.File saveProfileFile(String userId, MultipartFile multipartFile, FileDto fileDto) throws IOException {
@@ -186,7 +188,7 @@ public class FileService {
             // 해당 업로드 파일을 파일 경로에서 삭제
             for (com.example.blogdevelop.Domain.File file : fileList) {
                 if(!new File(absolutePath, file.getSaveName()).delete())
-                    throw new InvalidFileNameException(absolutePath+ file.getSaveName(), "잘못된 파일 경로입니다.");
+                    throw new InvalidFileNameException(absolutePath+file.getSaveName(), "잘못된 파일 경로입니다.");
             }
         }
     }
