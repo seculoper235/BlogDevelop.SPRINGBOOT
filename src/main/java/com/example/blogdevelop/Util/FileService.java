@@ -193,6 +193,17 @@ public class FileService {
         }
     }
 
+    // 파라미터: postId, userId
+    public void deletePostDir(int postId) {
+        // 해당 post 업로드 폴더 경로 얻어냄
+        Post post = postRepository.findById(postId).orElseThrow();
+        String postPath = postFilePath(post.getUser().getId(), postId);
+
+        // 폴더 삭제
+        if(!new File(absolutePath, postPath).delete())
+            throw new InvalidFileNameException(absolutePath+postPath, "잘못된 파일 경로입니다.");
+    }
+
     private String getFileName(String originFilename) {
         String name = originFilename.substring(originFilename.lastIndexOf("."));
         return UUID.randomUUID().toString().concat(name);
