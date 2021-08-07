@@ -3,6 +3,7 @@ package com.example.blogdevelop.Service;
 import com.example.blogdevelop.Repository.FileRepository;
 import com.example.blogdevelop.Repository.PostRepository;
 import com.example.blogdevelop.Repository.UserRepository;
+import com.example.blogdevelop.Util.FileService;
 import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.runner.RunWith;
@@ -30,6 +31,9 @@ public class FileServiceTest {
 
     @MockBean
     private PostRepository postRepository;
+
+    @MockBean
+    private FileService fileService;
 
     private String absolutePath = "/tmp/uploads/";
 
@@ -112,5 +116,16 @@ public class FileServiceTest {
                     System.out.println("업로드 파일 삭제 성공!");
             }
         }
+    }
+
+    @Test
+    @DisplayName("포스트 업로드 폴더 삭제 테스트")
+    public void delete_All_UploadPost_Test() {
+        // Given
+        int catId = 1;
+        int postId = 12;
+
+        // Code
+        new File(absolutePath, fileService.postFilePath(userId, postId)).delete();
     }
 }
