@@ -17,9 +17,15 @@ public class PostService {
     private final FileService fileService;
 
     // 전체 소제목 리스트 조회
+    public void allPosts() {
+        List<Post> posts = postRepository.findAll();
+    }
 
     // 포스트 한건 조회
-    // TODO 이미지 파일 경로도 같이 불러와야 함
+    public void selectPost(int postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow();
+    }
 
 
     // 포스트 이미지들 업로드
