@@ -5,6 +5,7 @@ import com.example.blogdevelop.Domain.User;
 import com.example.blogdevelop.Repository.FileRepository;
 import com.example.blogdevelop.Repository.PostRepository;
 import com.example.blogdevelop.Repository.UserRepository;
+import com.example.blogdevelop.Security.Dto.RegistInfo;
 import com.example.blogdevelop.Web.Setting.Dto.ImageType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +24,6 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class FileService {
-    // TODO 레포지토리 의존성을 줄일 것
     private final FileRepository fileRepository;
     private final UserRepository userRepository;
     private final PostRepository postRepository;
@@ -80,6 +80,7 @@ public class FileService {
             String originFilename = multipartFile.getOriginalFilename();
 
             // 업로드 용 파일 이름
+            assert originFilename != null;
             String fileName = getFileName(originFilename);
 
             // FileDto 객체 생성
@@ -128,6 +129,16 @@ public class FileService {
         }
 
         return dirPath;
+    }
+
+    public com.example.blogdevelop.Domain.File saveOAuthProfile(RegistInfo registInfo) {
+        com.example.blogdevelop.Domain.File file = com.example.blogdevelop.Domain.File.builder()
+                .name(registInfo.getProfile())
+                .saveName(registInfo.getProfile())
+                .contentType("image/jpeg")
+                .imageType(ImageType.PROFILE)
+                .build();
+        return fileRepository.save(file);
     }
 
     private com.example.blogdevelop.Domain.File saveProfileFile(String userId, MultipartFile multipartFile, FileDto fileDto) throws IOException {

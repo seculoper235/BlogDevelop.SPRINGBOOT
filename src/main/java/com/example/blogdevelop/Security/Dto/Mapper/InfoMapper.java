@@ -1,11 +1,12 @@
 package com.example.blogdevelop.Security.Dto.Mapper;
 
+import com.example.blogdevelop.Domain.File;
 import com.example.blogdevelop.Domain.User;
 import com.example.blogdevelop.Domain.UserAuthority;
 import com.example.blogdevelop.Security.Dto.RegistInfo;
 
 public class InfoMapper {
-    public static User toEntity(RegistInfo registInfo) {
+    public static User toEntity(RegistInfo registInfo, File profile) {
         return User.builder()
                 .id(registInfo.getUsername())
                 .password(registInfo.getUsername())
@@ -13,6 +14,7 @@ public class InfoMapper {
                 .email(registInfo.getEmail())
                 .description(registInfo.getImage())
                 .userAuthority(UserAuthority.USER)
+                .profile(profile)
                 .build()
                 ;
     }
