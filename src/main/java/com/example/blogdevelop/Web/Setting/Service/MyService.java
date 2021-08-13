@@ -53,12 +53,10 @@ public class MyService {
     }
 
     public void deleteUser(String userId) {
-        try {
-            userRepository.deleteById(userId);
-            SecurityContextHolder.clearContext();
-            log.info("삭제 완료되었습니다: [ " + userId +" ]");
-        } catch (EmptyResultDataAccessException e) {
-            log.error("존재하지 않는 유저입니다: [ " + userId +" ]");
-        }
+        userRepository.deleteById(userId);
+        SecurityContextHolder.clearContext();
+
+        if(userRepository.existsById(userId))
+            throw new NoSuchElementException();
     }
 }
