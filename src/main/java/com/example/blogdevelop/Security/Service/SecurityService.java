@@ -2,7 +2,6 @@ package com.example.blogdevelop.Security.Service;
 
 import com.example.blogdevelop.Domain.File;
 import com.example.blogdevelop.Domain.User;
-import com.example.blogdevelop.Repository.FileRepository;
 import com.example.blogdevelop.Repository.UserRepository;
 import com.example.blogdevelop.Security.Config.JwtProvider;
 import com.example.blogdevelop.Security.Dto.Mapper.InfoMapper;
@@ -10,7 +9,6 @@ import com.example.blogdevelop.Security.Dto.OAuthResponse;
 import com.example.blogdevelop.Security.Dto.RegistInfo;
 import com.example.blogdevelop.Security.Dto.UserDto;
 import com.example.blogdevelop.Util.FileService;
-import com.example.blogdevelop.Web.Setting.Dto.ImageType;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -39,13 +37,14 @@ public class SecurityService {
     // 의존성 주입
     @Value("${spring.security.oauth2.client.provider.google.user-info-uri}")
     private String GOOGLE_USERINFO;
+
     private final UserRepository userRepository;
     private final FileService fileService;
+
     private final ObjectMapper objectMapper;
     private final HashMap<String, UserDto> oAuthStorage;
     private final JwtProvider jwtProvider;
 
-    /* Redis 대신에 임시 저장소를 사용하고, 세션 ID 대신에 access token을 사용 */
 
     public OAuthResponse registerUserInfo(RegistInfo registInfo) {
         // access token을 활용하여 임시 저장소에서 OAuth 유저 정보를 가져옴
@@ -55,7 +54,7 @@ public class SecurityService {
         registInfo.setUpInfo(userDto);
 
         // RegistInfo를 User 엔티티에다 넣고 DB 저장
-        // TODO picture 필드는 File 엔티티를 새로 생성하여 저장(업로드 필요 X)
+        // picture 필드는 File 엔티티를 새로 생성하여 저장
         File userProfile = fileService.saveOAuthProfile(registInfo);
         User user = userRepository.save(InfoMapper.toEntity(registInfo, userProfile));
 
