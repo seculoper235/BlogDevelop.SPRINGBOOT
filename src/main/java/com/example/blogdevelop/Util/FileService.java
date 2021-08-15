@@ -64,7 +64,7 @@ public class FileService {
     }
 
     // TODO MultipartFile 리스트 업로드
-    public List<String> uploadPosts(ImageType imageType, List<MultipartFile> multipartFiles, String userId, int catId, int postId) throws IOException {
+    public List<String> uploadPosts(ImageType imageType, List<MultipartFile> multipartFiles, String userId, int postId) throws IOException {
         // 저장 폴더 생성
         String filePath = postFilePath(userId, postId);
 
@@ -103,6 +103,19 @@ public class FileService {
         return uploadFileList.stream()
                 .map(com.example.blogdevelop.Domain.File::getName)
                 .collect(Collectors.toList());
+    }
+
+    // File 데이터의 post 속성 정의
+    public List<com.example.blogdevelop.Domain.File> setPost(List<String> filePathList, Post post) {
+        List<com.example.blogdevelop.Domain.File> fileList = new ArrayList<>();
+        for (String path : filePathList) {
+            com.example.blogdevelop.Domain.File file = fileRepository.findByName(path);
+            file.setPost(post);
+            fileRepository.save(file);
+            fileList.add(file);
+        }
+
+        return fileList;
     }
 
     // 프로필 업데이트 시 실행되는 메소드
