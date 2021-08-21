@@ -6,13 +6,11 @@ import lombok.Getter;
 @Getter
 public class CategoryResponse {
     private final int id;
-    private final String title;
-    private final String content;
+    private final String name;
 
     @Builder
-    public CategoryResponse(int id, String title, String content) {
+    public CategoryResponse(int id, String name) {
         this.id = id;
-        this.title = title;
-        this.content = content;
+        this.name = name;
     }
 }
