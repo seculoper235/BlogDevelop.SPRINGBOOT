@@ -57,15 +57,21 @@ public class PostService {
     }
 
     // 포스트 한건 등록
-    // TODO 다시 file들을 일일히 조회하여 수정하는 것은 비효율적
+    // 다시 file들을 일일히 조회하여 수정하는 것은 비효율적
+    // --> 업로드된 파일들을 가지고 File 데이터를 생성하여 DB에 저장
     public PostResponse publishPost(PostRequest postRequest) {
+        // 현재 post에 해당하는 file들 조회하여 post를 설정
+        // Post가 등록되지 않은 filePathList를 어떻게 얻을지 생각
+        // --> 파일들의 업로드 경로는 클라이언트가 임시 저장하여 PostRequest에 담아 보냄
+        List<File> postFileList = null;
+
+        // PostRequest에 파일 리스트 저장
+        postRequest.setFileList(postFileList);
+
         // Post 저장
         Post post = postRepository.save(PostMapper.toEntity(postRequest));
 
-        // 현재 post에 해당하는 file들 조회하여 post를 설정
-        // TODO Post가 등록되지 않은 filePathList를 어떻게 얻을지 생각
-        List<File> postFileList = fileService.setPost(null, post);
-        return null;
+        return PostMapper.toResponse(post);
     }
 
     // 포스트 한건 삭제

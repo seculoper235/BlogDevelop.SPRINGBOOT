@@ -42,10 +42,11 @@ public class FileService {
     private String postPath;
 
 
+    /* 업로드 관련 */
     // 프로필 이미지 업로드
     public String uploadProfile(String userId, ImageType imageType, MultipartFile multipartFile) throws IOException {
         // 폴더 경로
-        String filePath = profileFilePath(userId);
+        String filePath = profileDirPath(userId);
         // 원본 파일 이름
         String originFilename = multipartFile.getOriginalFilename();
         // 업로드 용 파일 이름
@@ -67,20 +68,13 @@ public class FileService {
         return file.getName();
     }
 
-    // TODO MultipartFile 리스트 업로드
+    // MultipartFile 리스트 업로드
     public List<String> uploadPosts(ImageType imageType, List<MultipartFile> multipartFiles, String userId, int postId) throws IOException {
-        FileStore fileStore = Files.getFileStore(Path.of("/api"));
-        File testFile = new File("/api");
-
         // 저장 폴더 생성
-        String filePath = postFilePath(userId, postId);
+        String dirPath = postDirPath(userId, postId);
 
-        // 대상 포스트 조회
-        Post post = postRepository.findById(postId)
-                .orElseThrow();
-
-        // 업로드 된 File 들을 담을 리스트 생성
-        List<com.example.blogdevelop.Domain.File> uploadFileList = new ArrayList<>();
+        // 업로드 된 File 들의 저장 경로를 담을 리스트 생성
+        List<String> uploadPathList = new ArrayList<>();
 
         for (MultipartFile multipartFile : multipartFiles) {
             // 원본 파일 이름
@@ -90,70 +84,25 @@ public class FileService {
             assert originFilename != null;
             String fileName = getFileName(originFilename);
 
-            // FileDto 객체 생성
-            Path path = Path.of("");
-            String fileType = Files.probeContentType(path);
-            FileDto fileDto = FileDto.builder()
-                    .fileName(fileName)
-                    .contentType(multipartFile.getContentType())
-                    .imageType(imageType)
-                    .path(filePath +"/"+ fileName)
-                    .post(post)
-                    .build();
+            // 저장할 파일 경로
+            String filePath = dirPath +"/"+ fileName;
 
-            // 업로드 경로를 가지고 파일을 서버에 저장
-            com.example.blogdevelop.Domain.File uploadFile = savePostFile(multipartFile, fileDto);
+            // 파일 경로를 가지고 멀티 파일 업로드
+            File file = new File(absolutePath, filePath);
+            if(!file.exists())
+                multipartFile.transferTo(file);
 
             // 리스트에 추가
-            uploadFileList.add(uploadFile);
+            uploadPathList.add(file.getPath());
         }
 
         // 서버 상에 이미지가 저장된 경로를 반환
-        return uploadFileList.stream()
-                .map(com.example.blogdevelop.Domain.File::getName)
-                .collect(Collectors.toList());
+        return uploadPathList;
     }
 
-    // File 데이터의 post 속성 정의
-    public List<com.example.blogdevelop.Domain.File> setPost(List<String> filePathList, Post post) {
-        List<com.example.blogdevelop.Domain.File> fileList = new ArrayList<>();
-        for (String path : filePathList) {
-            com.example.blogdevelop.Domain.File file = fileRepository.findByName(path);
-            file.setPost(post);
-            fileRepository.save(file);
-            fileList.add(file);
-        }
 
-        return fileList;
-    }
-
-    // 프로필 업데이트 시 실행되는 메소드
-    public String profileFilePath(String userId) {
-        return createFilePath(userId, profilePath);
-    }
-
-    // 포스트 생성 시 실행되는 메소드
-    public String postFilePath(String userId, int postId) {
-        String path = postPath+ "/" +postId;
-        return createFilePath(userId, path);
-    }
-
-    // 소개 페이지 작성 시 실행되는 메소드
-    public String aboutFilePath(String userId) {
-        return createFilePath(userId, aboutPath);
-    }
-
-    private String createFilePath(String userId, String filePath) {
-        String dirPath = userId+filePath;
-        if (!new File(absolutePath, dirPath).exists()) {
-            if(!new File(absolutePath, dirPath).mkdirs())
-                throw new InvalidFileNameException(absolutePath+"/"+userId+filePath, "잘못된 파일 경로입니다.");
-        }
-
-        return dirPath;
-    }
-
-    public com.example.blogdevelop.Domain.File saveOAuthProfile(RegistInfo registInfo) {
+    /* DB 저장 관련 */
+    public com.example.blogdevelop.Domain.File saveDefaultProfile(RegistInfo registInfo) {
         com.example.blogdevelop.Domain.File file = com.example.blogdevelop.Domain.File.builder()
                 .name(registInfo.getProfile())
                 .saveName(registInfo.getProfile())
@@ -189,17 +138,37 @@ public class FileService {
         return file;
     }
 
-    // 포스트 파일 하나를 저장
-    private com.example.blogdevelop.Domain.File savePostFile(MultipartFile multipartFile, FileDto fileDto) throws IOException {
-        // fileDto를 가지고, 지정된 경로에 멀티 파일 업로드
-        multipartFile.transferTo(new File(absolutePath, fileDto.getPath()));
+    // 파일 업로드 경로들을 가지고 File 데이터 생성 및 저장
+    public List<com.example.blogdevelop.Domain.File> savePostFiles(List<String> filePathList) throws IOException {
+        List<com.example.blogdevelop.Domain.File> fileList = new ArrayList<>();
+        for (String path : filePathList) {
+            /* 데이터 추출 */
+            // 파일 이름
+            File uploadFile = new File("/api");
+            String name = uploadFile.getName();
+            // 컨텐츠 타입
+            String contentType = Files.probeContentType(uploadFile.toPath());
 
-        // FileDto를 File 엔티티로 변환 후 저장
-        com.example.blogdevelop.Domain.File file = FileMapper.toEntity(fileDto);
+            /* FileDto에 담음 */
+            FileDto fileDto = FileDto.builder()
+                    .fileName(name)
+                    .contentType(contentType)
+                    .imageType(ImageType.POST)
+                    .path(path)
+                    .build();
 
-        return fileRepository.save(file);
+            /* FileMapper로 FileDto -> File로 변환하여 저장 */
+            com.example.blogdevelop.Domain.File file = fileRepository.save(FileMapper.toEntity(fileDto));
+
+            /* 저장하고 나온 File 데이터를 파일 리스트에 담음 */
+            fileList.add(file);
+        }
+
+        return fileList;
     }
 
+
+    /* 삭제 관련 */
     // 업로드 삭제 버튼 클릭 시, 실행되는 메소드
     public com.example.blogdevelop.Domain.File setDeleteFlag(String filename) {
         // deleteFlag = 1로 바꿈
@@ -209,7 +178,7 @@ public class FileService {
         return fileRepository.save(file);
     }
 
-    // 포스트 저장 후, 바로 실행되는 업로드 파일 삭제 메소드
+    // 포스트 저장 후 실행되는 업로드 파일 삭제 메소드
     public void deletePostFile(int postId) {
         // 현재 존재하는 파일 리스트
         List<com.example.blogdevelop.Domain.File> fileList = fileRepository.findAllByPostId(postId);
@@ -231,15 +200,43 @@ public class FileService {
     public void deletePostDir(int postId) {
         // 해당 post 업로드 폴더 경로 얻어냄
         Post post = postRepository.findById(postId).orElseThrow();
-        String postPath = postFilePath(post.getUser().getId(), postId);
+        String postPath = postDirPath(post.getUser().getId(), postId);
 
         // 폴더 삭제
         if(!new File(absolutePath, postPath).delete())
             throw new InvalidFileNameException(absolutePath+postPath, "잘못된 파일 경로입니다.");
     }
 
+
+    /* 기타 관련 */
     private String getFileName(String originFilename) {
         String name = originFilename.substring(originFilename.lastIndexOf("."));
         return UUID.randomUUID().toString().concat(name);
+    }
+
+    // 프로필 폳더를 생성하는 메소드
+    public String profileDirPath(String userId) {
+        return createDirPath(userId, profilePath);
+    }
+
+    // 포스트 폳더를 생성하는 메소드
+    public String postDirPath(String userId, int postId) {
+        String path = postPath+ "/" +postId;
+        return createDirPath(userId, path);
+    }
+
+    // 소개 페이지 폳더를 생성하는 메소드
+    public String aboutDirPath(String userId) {
+        return createDirPath(userId, aboutPath);
+    }
+
+    private String createDirPath(String userId, String filePath) {
+        String dirPath = userId+filePath;
+        if (!new File(absolutePath, dirPath).exists()) {
+            if(!new File(absolutePath, dirPath).mkdirs())
+                throw new InvalidFileNameException(absolutePath+"/"+userId+filePath, "잘못된 파일 경로입니다.");
+        }
+
+        return dirPath;
     }
 }
