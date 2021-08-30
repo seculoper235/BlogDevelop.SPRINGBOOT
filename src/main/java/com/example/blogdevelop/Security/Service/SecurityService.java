@@ -55,7 +55,7 @@ public class SecurityService {
 
         // RegistInfo를 User 엔티티에다 넣고 DB 저장
         // picture 필드는 File 엔티티를 새로 생성하여 저장
-        File userProfile = fileService.saveOAuthProfile(registInfo);
+        File userProfile = fileService.saveDefaultProfile(registInfo);
         User user = userRepository.save(InfoMapper.toEntity(registInfo, userProfile));
 
         // createJwtToken() 실행

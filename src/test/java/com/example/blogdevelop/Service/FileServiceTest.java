@@ -126,6 +126,6 @@ public class FileServiceTest {
         int postId = 12;
 
         // Code
-        new File(absolutePath, fileService.postFilePath(userId, postId)).delete();
+        assertTrue(new File(absolutePath, fileService.postDirPath(userId, postId)).delete());
     }
 }
