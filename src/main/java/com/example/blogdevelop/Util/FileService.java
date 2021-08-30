@@ -17,6 +17,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileStore;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -65,6 +69,9 @@ public class FileService {
 
     // TODO MultipartFile 리스트 업로드
     public List<String> uploadPosts(ImageType imageType, List<MultipartFile> multipartFiles, String userId, int postId) throws IOException {
+        FileStore fileStore = Files.getFileStore(Path.of("/api"));
+        File testFile = new File("/api");
+
         // 저장 폴더 생성
         String filePath = postFilePath(userId, postId);
 
@@ -84,6 +91,8 @@ public class FileService {
             String fileName = getFileName(originFilename);
 
             // FileDto 객체 생성
+            Path path = Path.of("");
+            String fileType = Files.probeContentType(path);
             FileDto fileDto = FileDto.builder()
                     .fileName(fileName)
                     .contentType(multipartFile.getContentType())
@@ -162,6 +171,7 @@ public class FileService {
 
         // 기존 파일이 존재한다면 삭제
         File origin = new File(absolutePath, file.getSaveName());
+
         if(origin.exists()) {
             origin.delete();
             log.info("파일 삭제 성공!");

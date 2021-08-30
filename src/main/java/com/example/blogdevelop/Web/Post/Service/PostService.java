@@ -45,6 +45,7 @@ public class PostService {
 
     // 포스트 이미지들 업로드
     public List<String> uploadPostFiles(List<MultipartFile> multipartFiles, int postId) throws IOException {
+        // 파일 업로드만 실행
         Post post = postRepository.findById(postId).orElseThrow();
         List<String> postPathList = fileService.uploadPosts(ImageType.POST, multipartFiles, post.getUser().getId(), postId);
         return null;
